@@ -28,4 +28,9 @@ app.use(async (ctx, next) => {
     }
 });
 
-app.listen(config.httpPort);
+// app.listen(config.httpPort);
+
+
+let server  = app.listen(config.httpPort, () => {
+    console.log(`Example app listening on port ${server.address().port} using config ${config.httpPort} !`);
+});
