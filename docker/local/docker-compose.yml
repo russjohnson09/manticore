@@ -7,5 +7,5 @@ services:
       - './../../:/manticore'
       - /manticore/node_modules/
     ports:
-      - "4000:4000"
+      - "4555:4000"
     tty: true
