@@ -135,11 +135,13 @@ module.exports = app => {
     //websocket route for sending job information. manage the connections here
     //the middleware is similar to listening to the 'open' event for a ws connection
     app.ws.use(async (ctx, next) => {
+        console.log(`ws use`)
         //use the route that the client connects with as a validation measure
         //expected route: /api/v2/job/<PASSCODE>
         const route = '/api/v2/job/';
         const url = ctx.request.url;
         if (!url.startsWith(route)) { //wrong path. refuse connection
+            ctx.websocket.send('bad path, check url');
             ctx.websocket.close();
             return await next();
         }
@@ -149,6 +151,7 @@ module.exports = app => {
         //for passcode validation. bring back the id associated with the passcode
         const id = await websocket.validate(passcode, ctx.websocket);
         if (id === null) { //wrong passcode. refuse connection
+            ctx.websocket.send('bad path, check passcode');
             ctx.websocket.close();
             return await next();
         }

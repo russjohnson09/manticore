@@ -21,20 +21,31 @@ sleep 1
 cat /consul.log
 
 
-cd /manticore
-nohup npm start >/consul.log 2>&1 &
 
+echo "starting nomad"
 
 sleep 1
+cat /nomad/server.hcl
+nomad agent -config /nomad/server.hcl &
 
-cat /consul.log
+
+cd /manticore
+#nohup npm start >/consul.log 2>&1 &
+#nohup nodemon >/consul.log 2>&1 &
+
+
+echo "nodemon > /manticore.log 2>&1 &"
+nohup nodemon > /manticore.log 2>&1 &
+
+
 
 
 
 echo "started successfully"
 
 
-/bin/bash
+tail -f /manticore.log
+#/bin/bash
 
 
 #root@25d5103a595a:/# ps -a
