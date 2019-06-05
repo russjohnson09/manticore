@@ -20,5 +20,11 @@
 
 
 
-apt-get install redis-server -y
+#already installed on latest
+#apt-get install redis-server -y
+#npm install -g nodemon
+
+#rm -R /tmp/nomad/ || true
+
+dockerd &
 

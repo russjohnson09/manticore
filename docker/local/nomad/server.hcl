@@ -3,6 +3,7 @@
 # Increase log verbosity
 log_level = "DEBUG"
 
+# rm -R /tmp/nomad/
 # Setup data directory
 data_dir = "/tmp/nomad"
 

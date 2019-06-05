@@ -1,6 +1,4 @@
 FROM russjohnson09/manticore-local:latest
-RUN npm install -g nodemon
-
 
 ADD install.sh /install.sh
 RUN chmod +x /install.sh
@@ -14,7 +12,10 @@ RUN mkdir -p /nomad
 #https://github.com/smartdevicelink/manticore/wiki/Set-up-the-clusters
 ADD ./nomad/server.hcl /nomad/server.hcl
 ADD ./nomad/client.hcl /nomad/client.hcl
+ADD ./nomad/server.hcl /nomad/server.hcl
+ADD ./nomad/nomad-start.sh /nomad/nomad-start.sh
 
+RUN chmod +x /nomad/nomad-start.sh
 
 
 #https://github.com/hashicorp/nomad/issues/696

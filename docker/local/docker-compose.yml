@@ -1,6 +1,7 @@
 version: '2'
 services:
   web:
+    #dockerd & may need to be ran on the container the first time.
     build: .
     #https://github.com/docker/compose/issues/123
     privileged: true
