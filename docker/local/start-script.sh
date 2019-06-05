@@ -1,6 +1,20 @@
 #!/usr/bin/env bash
 
 
+sleep 1
+echo "start docker"
+echo "dockerd &"
+dockerd &
+
+
+echo "start redis"
+redis-server &
+
+sleep 1
+redis-cli PING
+
+
+
 cd /manticore
 npm install
 npm run build-webpage
@@ -29,7 +43,7 @@ cat /nomad/server.hcl
 nomad agent -config /nomad/server.hcl &
 
 
-sleep 1
+sleep 5
 
 echo "start nomad client 1"
 cat /nomad/client.hcl
@@ -42,6 +56,18 @@ nomad node status
 
 sleep 1
 echo "started client successfully"
+
+
+
+
+
+sleep 10
+echo "test nomad server"
+
+nomad status
+nomad server members
+nomad node status
+nomad plan example.nomad
 
 cd /manticore
 #nohup npm start >/consul.log 2>&1 &

@@ -1,9 +1,14 @@
-FROM russjohnson09/manticore-local:dev
+FROM russjohnson09/manticore-local:latest
 RUN npm install -g nodemon
 
 
-ADD start-script.sh /start-script.sh
-RUN chmod +x /start-script.sh
+ADD install.sh /install.sh
+RUN chmod +x /install.sh
+RUN /install.sh
+
+
+#ADD start-script.sh /start-script.sh
+#RUN chmod +x /start-script.sh
 
 
 RUN mkdir -p /nomad
@@ -12,6 +17,15 @@ ADD ./nomad/server.hcl /nomad/server.hcl
 ADD ./nomad/client.hcl /nomad/client.hcl
 
 RUN chmod +x /start-script.sh
+
+#https://github.com/hashicorp/nomad/issues/696
+
+#nomad requirements?
+#add-apt-repository \
+ #   "deb [arch=amd64] https://download.docker.com/linux/debian \
+ #   $(lsb_release -cs) \
+ #   stable"
+#apt-get install docker-ce docker-ce-cli containerd.io
 
 
 #container can have one entry point. this should not exit and can run multiple required background processes.
