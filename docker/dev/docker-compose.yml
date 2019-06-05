@@ -4,7 +4,7 @@ services:
     #dockerd & may need to be ran on the container the first time.
     build: .
     privileged: true
-    container_name: manticore_local
+    container_name: manticore_dev
     volumes:
       - './../../:/manticore'
       - /manticore/node_modules/
