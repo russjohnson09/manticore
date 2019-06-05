@@ -1,3 +1,5 @@
+#https://github.com/smartdevicelink/manticore/wiki/Set-up-the-clusters
+
 # Increase log verbosity
 log_level = "DEBUG"
 

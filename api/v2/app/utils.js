@@ -341,7 +341,7 @@ async function getRecentEvals (evals, taskGroupNames) {
 
 async function setJob (key, opts) {
     let url = `http://${config.clientAgentIp}:${config.nomadAgentPort}/v1/job/${key}`;
-    console.log(`setJob`,url,opts);
+    console.log(`setJob`,url,JSON.stringify(opts,null,' '));
     return await http(url, {
         method: 'POST',
         body: JSON.stringify(opts)
