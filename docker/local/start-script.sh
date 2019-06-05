@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 
+rm /var/lib/docker/runtimes -R || true
 sleep 1
 echo "start docker"
 echo "dockerd &"
@@ -60,9 +61,27 @@ echo "started client successfully"
 
 
 
-
-sleep 10
 echo "test nomad server"
+
+sleep 1
+echo "."
+sleep 1
+echo "."
+sleep 1
+echo "."
+sleep 1
+echo "."
+sleep 1
+echo "."
+sleep 1
+echo "."
+sleep 1
+echo "."
+sleep 1
+echo "."
+
+
+
 
 nomad status
 nomad server members

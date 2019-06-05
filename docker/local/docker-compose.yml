@@ -10,4 +10,5 @@ services:
       - /manticore/node_modules/
     ports:
       - "4555:4000"
+      - "4646:4646" #nomad ui
     tty: true
