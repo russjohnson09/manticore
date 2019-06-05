@@ -28,13 +28,7 @@
   "TaskGroups": [
     {
       "Affinities": null,
-      "Constraints": [
-        {
-          "LTarget": "${meta.job}",
-          "Operand": "=",
-          "RTarget": "1"
-        }
-      ],
+      "Constraints": null,
       "Count": 1,
       "EphemeralDisk": {
         "Migrate": false,

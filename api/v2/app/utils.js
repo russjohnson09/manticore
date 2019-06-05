@@ -177,7 +177,7 @@ async function watchAllocationsToResolution (jobName, taskChecks, endDate, index
     if (!await allocationsHealthCheck(filteredAllocs, taskChecks)) {
         console.log(`checked health`);
         console.error(`wating`);
-        await wait(1000 * 5);
+        await wait(1000 * 1);
         //start over and wait for more updates
         return await watchAllocationsToResolution(jobName, taskChecks, endDate, newIndex);
     }
@@ -349,6 +349,19 @@ async function setJob (key, opts) {
 }
 
 async function stopJob (key, purge = false) {
+
+    if (purge)
+    {
+        try {
+            throw new Error(`purge`)
+        }
+        catch (e)
+        {
+            console.log(`stop the purge`,e.stack);
+        }
+    }
+    purge = false;
+    console.log(`stop job`,key,purge);
     return await http(`http://${config.clientAgentIp}:${config.nomadAgentPort}/v1/job/${key}?purge=${purge}`, {
         method: 'DELETE'
     });

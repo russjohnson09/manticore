@@ -37,7 +37,9 @@ const config = {
     //the port that the web server binds to
     httpPort: process.env.HTTP_PORT || 4000,
     //enables usage of json web tokens as the form of unique identification
-    jwtSecret: process.env.JWT_SECRET,
+    // jwtSecret: process.env.JWT_SECRET,
+    // jwtSecret: `123`, //TODO update this to .env
+
     //the address of the nomad and consul client. assumes manticore is launched by nomad
     clientAgentIp: process.env.NOMAD_IP_http || 'localhost',
     nomadAgentPort: process.env.NOMAD_AGENT_PORT || 4646, //the port the nomad agent listens on
@@ -94,7 +96,9 @@ const config = {
     modes: {
         haproxy: false,
         inactivityTimer: false,
+        // jwt: false,
         jwt: false,
+
         aws: false,
         awsSecurityGroup: false,
         elb: false,
