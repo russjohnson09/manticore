@@ -2,3 +2,10 @@ node_modules/
 *.log
 .env
 dist/
+
+
+.vagrant/*
+*.vagrant/*
+
+vagrant/nomad/.vagrant/
+
