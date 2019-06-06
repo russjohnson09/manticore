@@ -45,11 +45,6 @@ module.exports = app => {
     /* MIDDLEWARE */
     const router = new Router();
 
-    app.use(async (ctx,next) => {
-        console.log(`request`,ctx.method,config.modes.jwt);
-        next();
-    });
-
     if (config.cors || !config.webpageDisabled){
         app.use(cors());
     }
@@ -61,11 +56,9 @@ module.exports = app => {
 
     //consolidate the identification types to the id property in the body
     app.use(async (ctx, next) => {
-        // ctx.request.body.id = '' + 1;
-        // console.log(`jwt`,config.modes.jwt,ctx.state);
-        // if (config.modes.jwt && ctx.state.user) {
-        //     ctx.request.body.id = '' + ctx.state.user.user_id;
-        // }
+        if (config.modes.jwt && ctx.state.user) {
+            ctx.request.body.id = '' + ctx.state.user.user_id;
+        }
         await next();
     });
 
@@ -88,7 +81,6 @@ module.exports = app => {
 
     //submit a job for a user
     router.post(`${API_PREFIX}/job`, async (ctx, next) => {
-        console.log(`post job`,ctx.request.body);
         logger.debug(`POST ${API_PREFIX}/job\n` + JSON.stringify(ctx.request.body));
         //user id check
         const ID = ctx.request.body.id;
@@ -143,14 +135,11 @@ module.exports = app => {
     //websocket route for sending job information. manage the connections here
     //the middleware is similar to listening to the 'open' event for a ws connection
     app.ws.use(async (ctx, next) => {
-        console.log(`ws use`)
         //use the route that the client connects with as a validation measure
         //expected route: /api/v2/job/<PASSCODE>
         const route = '/api/v2/job/';
         const url = ctx.request.url;
         if (!url.startsWith(route)) { //wrong path. refuse connection
-            // ctx.websocket.send('bad path, check url');
-            console.log(`bad path, check url'`);
             ctx.websocket.close();
             return await next();
         }
@@ -160,9 +149,6 @@ module.exports = app => {
         //for passcode validation. bring back the id associated with the passcode
         const id = await websocket.validate(passcode, ctx.websocket);
         if (id === null) { //wrong passcode. refuse connection
-            console.log(`bad path, check passcode'`);
-
-            // ctx.websocket.send('bad path, check passcode');
             ctx.websocket.close();
             return await next();
         }
