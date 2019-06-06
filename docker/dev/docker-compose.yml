@@ -8,7 +8,12 @@ services:
     volumes:
       - './../../:/manticore'
       - /manticore/node_modules/
+    #https://www.reddit.com/r/docker/comments/7dhszj/dockercompose_how_do_i_expose_a_port_to_my/
+    expose:
+      - "8500"
     ports:
       - "4557:4000"
       - "4848:4646" #nomad ui
+      - "8500:8500" #consul agent -dev -ui
+      #- "8500" #consul agent -dev -ui
     tty: true

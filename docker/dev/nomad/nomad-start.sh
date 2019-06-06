@@ -6,14 +6,16 @@ mkdir -p /logs
 
 rm -R /tmp/nomad/ || true
 
-consul agent -dev > /logs/consul-agent.log 1>&2 &
+#https://stackoverflow.com/questions/35132687/how-to-access-externally-to-consul-ui
+#consul agent -dev > /logs/consul-agent.log 2>&1 &
+consul agent -dev -ui -client 0.0.0.0 > /logs/consul-agent.log 2>&1 &
 
 
 echo "starting nomad server"
 
 sleep 1
 cat /nomad/server.hcl
-nomad agent -config /nomad/server.hcl > /logs/nomad-server.log 1>&2 &
+nomad agent -config /nomad/server.hcl > /logs/nomad-server.log 2>&1 &
 
 
 
@@ -27,7 +29,7 @@ sleep 5
 
 echo "start nomad client 1"
 cat /nomad/client.hcl
-nomad agent -config /nomad/client.hcl > /logs/nomad-client.log 1>&2 &
+nomad agent -config /nomad/client.hcl > /logs/nomad-client.log 2>&1 &
 
 
 echo "check clients are running"
