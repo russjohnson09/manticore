@@ -106,20 +106,6 @@ function createErrorResponse (message) {
 //responsible for advancing the state of the job for a request
 //can modify the context object passed in from manticore
 async function advance (ctx) {
-
-    try {
-        throw new Error(`manticore/index.js->advance`);
-    }
-    catch (e)
-    {
-        console.log(`manticore/index.js->advance`);
-
-        console.error(e);
-
-    }
-
-
-
     //note: modify currentRequest as a shortcut to modifying waitingState
     const {currentRequest, waitingState} = ctx;
     const {id, request} = currentRequest;

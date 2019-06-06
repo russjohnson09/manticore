@@ -102,15 +102,6 @@ async function autoHandleAll (config) {
 //this modifies ctx so the caller function can see what the suggested action is
 //returns whether the job is submitted without errors
 async function autoHandleJob (ctx, jobName, jobFile, taskChecks, taskGroupNames, healthTime = 10000) {
-
-    try {
-        throw new Error(`autoHandleJob call`);
-    }
-    catch (e)
-    {
-        console.log(`autoHandlJob Call`);
-        console.log(e.stack);
-    }
     //perform a job CAS
     const jobSetter = await casJob(jobName);
     const jobResult = await jobSetter.set(jobFile); //submit the job
@@ -142,14 +133,6 @@ async function autoHandleJob (ctx, jobName, jobFile, taskChecks, taskGroupNames,
     return true;
 }
 
-
-async function wait(time)
-{
-    return new Promise((r) => {
-        setTimeout(r,time);
-    })
-}
-
 //continuously hit the allocations endpoint until either the end date is passed or until the status is running
 async function watchAllocationsToResolution (jobName, taskChecks, endDate, index) {
     let baseUrl = `http://${config.clientAgentIp}:${config.nomadAgentPort}/v1/job/${jobName}/allocations?`;
@@ -175,9 +158,6 @@ async function watchAllocationsToResolution (jobName, taskChecks, endDate, index
     }
 
     if (!await allocationsHealthCheck(filteredAllocs, taskChecks)) {
-        console.log(`checked health`);
-        console.error(`wating`);
-        await wait(1000 * 1);
         //start over and wait for more updates
         return await watchAllocationsToResolution(jobName, taskChecks, endDate, newIndex);
     }
@@ -340,28 +320,13 @@ async function getRecentEvals (evals, taskGroupNames) {
 }
 
 async function setJob (key, opts) {
-    let url = `http://${config.clientAgentIp}:${config.nomadAgentPort}/v1/job/${key}`;
-    console.log(`setJob`,url,JSON.stringify(opts,null,' '));
-    return await http(url, {
+    return await http(`http://${config.clientAgentIp}:${config.nomadAgentPort}/v1/job/${key}`, {
         method: 'POST',
         body: JSON.stringify(opts)
     });
 }
 
 async function stopJob (key, purge = false) {
-
-    if (purge)
-    {
-        try {
-            throw new Error(`purge`)
-        }
-        catch (e)
-        {
-            console.log(`stop the purge`,e.stack);
-        }
-    }
-    purge = false;
-    console.log(`stop job`,key,purge);
     return await http(`http://${config.clientAgentIp}:${config.nomadAgentPort}/v1/job/${key}?purge=${purge}`, {
         method: 'DELETE'
     });

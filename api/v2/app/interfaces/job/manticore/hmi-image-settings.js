@@ -29,15 +29,11 @@ function generateJobFile (job, body, envs) {
     for (let envName in info.envs) {
         job.addEnv(groupName, taskName, envName, info.envs[envName]);
     }
-
-
-    //TODO what does this constraint do?
-    // job.addConstraint({
-    //     LTarget: "${meta.job}",
-    //     Operand: "=",
-    //     RTarget: "1"
-    // }, groupName);
-
+    job.addConstraint({
+        LTarget: "${meta.job}",
+        Operand: "=",
+        RTarget: "1"
+    }, groupName);
     //set resource limitations
     job.setCPU(groupName, taskName, resources.cpu);
     job.setMemory(groupName, taskName, resources.memory);
