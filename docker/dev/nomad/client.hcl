@@ -19,6 +19,10 @@ client {
 
     cpu_total_compute = 4200
 
+    meta {
+        "manticore" = true
+        "job" = true
+    }
 
 }
 

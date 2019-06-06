@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 
 
+echo "nomad-start version 1"
+mkdir -p /logs
 
 rm -R /tmp/nomad/ || true
 
-consul agent -dev &
+consul agent -dev > /logs/consul-agent.log 1>&2 &
 
 
 echo "starting nomad server"
 
 sleep 1
 cat /nomad/server.hcl
-nomad agent -config /nomad/server.hcl &
+nomad agent -config /nomad/server.hcl > /logs/nomad-server.log 1>&2 &
 
 
 
@@ -25,7 +27,7 @@ sleep 5
 
 echo "start nomad client 1"
 cat /nomad/client.hcl
-nomad agent -config /nomad/client.hcl &
+nomad agent -config /nomad/client.hcl > /logs/nomad-client.log 1>&2 &
 
 
 echo "check clients are running"

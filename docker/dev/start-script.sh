@@ -4,7 +4,7 @@
 
 
 
-echo "version 1.1"
+echo "version 1.2"
 rm /var/lib/docker/runtimes -R || true
 rm /var/run/docker.pid || true
 sleep 1
@@ -21,6 +21,7 @@ redis-server &
 sleep 1
 redis-cli PING
 
+echo "run nomad start"
 /nomad/nomad-start.sh
 
 
