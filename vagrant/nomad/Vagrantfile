@@ -23,6 +23,26 @@ sudo docker --version
 # Packages required for nomad & consul
 sudo apt-get install unzip curl vim -y
 
+
+#node
+sudo apt update
+#sudo apt install nodejs
+#nodejs --version
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+nvm --version
+nvm install node
+node -v
+npm -v
+sudo apt install gcc g++ make
+
+npm install -g nodemon
+
+#node end
+
+
 echo "Installing Nomad..."
 NOMAD_VERSION=0.8.6
 cd /tmp/
@@ -56,15 +76,13 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: $script, privileged: false
 
   # Expose the nomad api and ui to the host
-  config.vm.network "forwarded_port", guest: 4646, host: 4646, auto_correct: true
 
-#        - "4557:4000"
-#        - "4848:4646" #nomad ui
-#        - "8500:8500" #consul agent -dev -ui
-        #- "8500" #consul agent -dev -ui
-  config.vm.network "forwarded_port", guest: 4557, host: 4000, auto_correct: true
-  config.vm.network "forwarded_port", guest: 4848, host: 4646, auto_correct: true
-  config.vm.network "forwarded_port", guest: 8500, host: 8500, auto_correct: true
+  #nodemon
+  config.vm.network "forwarded_port", guest: 4100, host: 4100, auto_correct: false
+  #nomad
+  config.vm.network "forwarded_port", guest: 4646, host: 4646, auto_correct: false
+  #consul
+  config.vm.network "forwarded_port", guest: 8500, host: 8500, auto_correct: false
 
   # Increase memory for Parallels Desktop
   config.vm.provider "parallels" do |p, o|
