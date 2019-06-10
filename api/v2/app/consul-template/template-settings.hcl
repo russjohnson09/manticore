@@ -3,7 +3,7 @@
 # sudo consul-template -config template-settings.hcl &
 
 consul {
-    address= "$LOCAL_IP:8500"
+    #address= "127.0.0.1:8500"
 }
 
 template {
