@@ -9,6 +9,6 @@ consul {
 template {
     source = "haproxy.tmpl"
     destination = "/etc/haproxy/haproxy.cfg"
-    command = "/bin/bash -c 'sudo service haproxy reload || true'"
+    command = "/bin/bash -c 'sudo sed -i 's/127.0.0.1:/10.0.2.15:/g' /etc/haproxy/haproxy.cfg || sudo service haproxy reload || true'"
     wait = "2s:4s"
 }
