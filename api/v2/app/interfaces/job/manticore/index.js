@@ -58,6 +58,7 @@ async function validate (body) {
         return createErrorResponse("Request body is invalid");
     }
 
+    //core versions [ '5.1.2' ]
     const coreVersionValid = jobInfo.core.versions.includes(body.core.version);
     const coreBuildValid = jobInfo.core.builds.includes(body.core.build);
     const hmiTypeIndex = jobInfo.hmis.findIndex(elem => {
@@ -66,6 +67,7 @@ async function validate (body) {
     const hmiVersionValid = hmiTypeIndex !== -1 && jobInfo.hmis[hmiTypeIndex].versions.includes(body.hmi.version);
     
     if (!coreVersionValid) {
+        console.log(`core versions`,jobInfo.core.versions);
         return createErrorResponse("Not a valid core version: " + body.core.version);
     }
     if (!coreBuildValid) {
