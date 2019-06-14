@@ -33,5 +33,24 @@ python3 --version
 
 
 #Start Proxy
+
+
+##Prod (Still Testing Environment just manticore on prod that all devs have access to)
+pass in the port for m.sdl.tools
+
+
+
+
+
+
+
+
+
+##Staging
+https://staging.smartdevicelink.com/resources/manticore/
+
+pass in the port for staging.sdl.tools
+17797
+
 python3 Sdl.py 
 

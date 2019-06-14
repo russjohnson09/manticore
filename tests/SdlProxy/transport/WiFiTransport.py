@@ -3,36 +3,6 @@ import socket
 import threading
 
 
-# include standard modules
-import getopt, sys
-
-# read commandline arguments, first
-fullCmdArguments = sys.argv
-
-# - further arguments
-argumentList = fullCmdArguments[1:]
-
-print(argumentList)
-
-# include standard modules
-import argparse
-
-# initiate the parser
-parser = argparse.ArgumentParser()
-
-parser.add_argument("--port", "-p", help="set output width", default=3000)
-parser.add_argument("--domain", "-d", help="set output width", default=3000)
-
-args = parser.parse_args()
-
-
-print(args)
-
-print(args.port)
-
-
-
-exit(0)
 
 
 

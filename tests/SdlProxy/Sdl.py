@@ -1,6 +1,31 @@
 from protocol import SdlPacket, ServiceType, SdlPacketFactory
 from transport import SdlPsm, WiFiTransport
 from session import SdlSession
+import sys,os
+
+
+# include standard modules
+import argparse
+
+# initiate the parser
+parser = argparse.ArgumentParser()
+
+#parser.add_argument("--url", "-u", help="set output width", default="m.sdl.tools")
+#parser.add_argument("--url", "-u", default="mstaging.sdl.tools")
+
+
+#https://staging.smartdevicelink.com/resources/manticore/
+#11232
+parser.add_argument("--url", "-u", default="m.sdl.tools")
+parser.add_argument("--port", "-p", required=True)
+
+
+args = parser.parse_args()
+
+
+print(args)
+
+print(args.port)
 
 
 # ------------------------------------------------------------
@@ -51,8 +76,8 @@ class Sdl:
     #port = 5316
 
 
-    url = 'mstaging.sdl.tools'
-    port = 19828
+    url = args.url
+    port = int(args.port)
 
     print(" ***** Attempting to create TCP connection ***** " + url + ':' + (str(port)))
     #PING manticore-2-3-0-0-production-elb-692312183.us-east-1.elb.amazonaws.com (34.202.219.3): 56 data bytes
@@ -61,5 +86,34 @@ class Sdl:
     tcp.init(url, port, session.handle_packet)
     tcp.connect()
     print(" ***** Connected *****")
+
     session.init(tcp.write)
+
+
+
+    print("construct")
+
+    packet1 = packet.construct_packet()
+
+    print(packet1)
+    print(packet1.decode("utf-8"))
+    print(packet1.decode("ascii"))
+    #os._exit(1)
+    #sys.exit()
+
+
+
+
     tcp.write(packet.construct_packet())
+
+
+    #print("write package")
+    #os._exit(1)
+     #16142 INFO  [19:15:41,177][ProtocolHandler] Processing incoming data of size 8 for connection 1249
+     #16143 WARN  [19:15:41,177][ProtocolHandler] Unknown version:1
+     #16144 WARN  [19:15:41,177][ProtocolHandler] Unknown version:1
+     #16145 INFO  [19:15:41,177][ProtocolHandler] Created and passed 1 packets
+     #16146 WARN  [19:15:41,177][ConnectionHandler] Connection not found !
+     #16147 INFO  [19:15:41,177][ProtocolHandler] StartSession ID 0 and Connection ID 1249
+     #16148 WARN  [19:15:41,177][ConnectionHandler] Session not found in this connection!
+
