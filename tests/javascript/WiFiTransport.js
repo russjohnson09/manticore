@@ -1,5 +1,7 @@
 const Net = require('net');
 
+const SdlPsm = require('./SdlPsm');
+
 
 module.exports = class WiFiTransport {
 
@@ -18,7 +20,12 @@ module.exports = class WiFiTransport {
         this.tcpConnectionOpts = {
             port,
             host
-        }
+        };
+
+        this.sdlPsm = new SdlPsm();
+
+        // console.log(`sdl`,this.sdlPsm);
+        // process.exit(0);
 
 
     }
@@ -27,7 +34,7 @@ module.exports = class WiFiTransport {
     {
         let self = this;
 
-        self.client.on('data',self.dataHandler);
+        self.client.on('data',self.dataHandler.bind(self));
         // client.on('data', function(chunk) {
         //
         // }
@@ -97,10 +104,41 @@ module.exports = class WiFiTransport {
     }
 
 
+    //russ_manticore/tests/SdlProxy/transport/SdlPsm.py
+
+
+    //Need to handle the data by putting it together until the entire request has completed.
     dataHandler(chunk)
     {
-        console.log(`dataHandler called`,this);
-        console.log(`Data received from the server: ${chunk.toString()}.`);
+        console.log(`dataHandler called`,chunk);
+
+        for (let byte of chunk)
+        {
+            console.log(`read btype`,byte);
+            this.sdlPsm.readByte(byte)
+
+        }
+
+        // version:  4
+        // encryption:  False
+        // frame type:  0
+        // service type:  7
+        // frame info:  2
+        // session id:  2
+        // data length:  4
+        // message id:  16
+        // payload :  bytearray(b'\x00\x02\x01\xbf')
+
+
+        //Read data:  b'@\x07\x02\x02\x00\x00\x00\x04\x00\x00\x00\x10\x00\x02\x01\xbf'
+        // dataHandler called <Buffer 40 07 02 01 00 00 00 04 00 00 00 13 00 01 00 cc>
+
+
+        //chunk is a bytearray that needs to be parse.
+
+
+
+        // console.log(`Data received from the server: ${chunk.toString()}.`);
 
         // Request an end to the connection after the data has been received.
         // client.end();
