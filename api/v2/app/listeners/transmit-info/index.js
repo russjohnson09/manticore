@@ -52,6 +52,8 @@ module.exports = {
         next();
     },
     "ws-connect": async (ctx, next) => {
+        process.exit(1);
+        console.log(`ws-connect`,ctx);
         //if instance information already exists for this user, then send it
         const positionInfo = getInfo(ctx.id, "position");
         const serviceInfo = getInfo(ctx.id, "services");

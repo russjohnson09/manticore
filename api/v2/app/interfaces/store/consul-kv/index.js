@@ -17,7 +17,8 @@ async function watch (key, cb) {
     });
     watch.on('error', function (err) { //couldn't connect to the agent
         if (err.code === "ECONNREFUSED") {
-            throw Error("Could not connect to Consul agent at IP " + config.clientAgentIp);
+            // throw Error("Could not connect to Consul agent at IP " + config.clientAgentIp);
+            console.error("Could not connect to Consul agent at IP " + config.clientAgentIp);
         }
         else {
             throw Error(err);
@@ -25,7 +26,7 @@ async function watch (key, cb) {
     });
     //expose a function to stop the watch
     return {
-        end: watch.end.bind(watch) 
+        end: watch.end.bind(watch)
     }
 }
 
@@ -53,7 +54,7 @@ function createUpdateHandler (key, data) {
             //if the index has changed in the remote, this set will fail. this means
             //that another server submitted the same change first
             return await set({
-                key: key, 
+                key: key,
                 value: newValue,
                 cas: casIndex
             });

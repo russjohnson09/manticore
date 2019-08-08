@@ -54,10 +54,10 @@ module.exports = {
         return await job.validate(body);
     },
     //store a request and return a websocket address for the client to listen on
-    storeRequest: async (id, body) => { 
+    storeRequest: async (id, body) => {
         const setter = await store.cas(REQUESTS_KEY);
         const requestState = await parseJson(setter.value);
-        
+
         requestBatch.add({
             id: id,
             type: "add",
@@ -110,8 +110,9 @@ for (let name in config.modes) {
     logger.info(`Mode ${name} is ${enabledString}`);
 }
 
+//TODO config for stub.
 //initialize watches to the KV store
-startWatches().catch(err => logger.error(new Error(err).stack));
+// startWatches().catch(err => logger.error(new Error(err).stack));
 
 async function startWatches () {
     //load up the listeners to the listener store
@@ -163,7 +164,7 @@ async function requestTrigger (requestSetter) {
     if (!success) return; //the update already happened
 
     //submit the new waiting state to the store
-    await waitingSetter.set(JSON.stringify(ctx.waitingState)); 
+    await waitingSetter.set(JSON.stringify(ctx.waitingState));
 }
 
 function compareObjKeys (a, b) {
@@ -231,7 +232,7 @@ async function batchFunction (data) {
     //get the current request state
     const setter = await store.cas(REQUESTS_KEY);
     const requestState = await parseJson(setter.value);
-    
+
     //process the array of requests for a single update to the store
     const removedObjs = [];
     //preserve the order of data when handling it! use shift and unshift instead of push and pop
@@ -253,7 +254,7 @@ async function batchFunction (data) {
 
     if (!updatedState) return; //no updates happened. avoid redundant update
 
-    const success = await setter.set(JSON.stringify(requestState)); //submit the new entry to the store   
+    const success = await setter.set(JSON.stringify(requestState)); //submit the new entry to the store
     //if the write failed, then the data needs to be resubmitted
     if (!success) {
         while (removedObjs.length > 0) {

@@ -45,9 +45,31 @@ module.exports = app => {
     /* MIDDLEWARE */
     const router = new Router();
 
-    if (config.cors || !config.webpageDisabled){
-        app.use(cors());
-    }
+    //https://stackoverflow.com/questions/49633157/how-do-i-set-headers-to-all-responses-in-koa-js
+    app.use(function(ctx, next) {
+        ctx.set("Access-Control-Allow-Origin", "*");
+        // res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        ctx.set("Access-Control-Allow-Headers", "*");
+
+            console.log(`method`,ctx.method);
+
+        if (ctx.method == 'OPTIONS')
+        {
+            ctx.response.status = 200;
+            return;
+        }
+        next();
+    });
+
+    // app.option(function(ctx,next) {
+    //     console.log(`option`);
+    //     return;
+    // })
+
+
+    // if (config.cors || !config.webpageDisabled){
+    //     app.use(cors());
+    // }
 
     //all routes under /api/v2 are eligible for identification via JWT if enabled
     if (config.modes.jwt) {
@@ -74,14 +96,39 @@ module.exports = app => {
 
     //return all viable job types
     router.get(`${API_PREFIX}/job`, async (ctx, next) => {
-        logger.debug(`GET ${API_PREFIX}/job`);
-        ctx.response.body = await logic.getJobInfo()
-            .catch(err => logger.error(new Error(err).stack));
+        console.log(`GET JOB TYPES`);
+
+        if (true)
+        {
+            let stub = {"core":{"versions":["5.1.3"],"builds":["default"]},"hmis":[{"type":"generic","versions":["minimal-0.6.1"]}]};
+            ctx.response.body = stub;
+            return;
+        }
+        else {
+
+            logger.debug(`GET ${API_PREFIX}/job`);
+            ctx.response.body = await logic.getJobInfo()
+              .catch(err => logger.error(new Error(err).stack));
+        }
+
     });
 
     //submit a job for a user
     router.post(`${API_PREFIX}/job`, async (ctx, next) => {
         logger.debug(`POST ${API_PREFIX}/job\n` + JSON.stringify(ctx.request.body));
+
+        if (true)
+        {
+            let stub = {
+                domain: 'localhost',
+                path: "/api/v2/job/", protocol: "ws", passcode: "4f0ScyJJzPLLikBO", port: config.httpPort
+            };
+
+            ctx.response.body = stub;
+            return;
+        }
+        else {
+        }
         //user id check
         const ID = ctx.request.body.id;
         if (!validateId(ID)) return handle400(ctx, "Invalid or missing id");
@@ -135,6 +182,8 @@ module.exports = app => {
     //websocket route for sending job information. manage the connections here
     //the middleware is similar to listening to the 'open' event for a ws connection
     app.ws.use(async (ctx, next) => {
+        console.log(`connection`,`test`);
+        // process.exit(1);
         //use the route that the client connects with as a validation measure
         //expected route: /api/v2/job/<PASSCODE>
         const route = '/api/v2/job/';
@@ -148,10 +197,14 @@ module.exports = app => {
         const passcode = url.substring(route.length);
         //for passcode validation. bring back the id associated with the passcode
         const id = await websocket.validate(passcode, ctx.websocket);
-        if (id === null) { //wrong passcode. refuse connection
-            ctx.websocket.close();
-            return await next();
-        }
+        console.log(`connection`,`validate`,id);
+
+        //TODO better stub.
+        //
+        // if (id === null) { //wrong passcode. refuse connection
+        //     ctx.websocket.close();
+        //     return await next();
+        // }
 
         //validated and found the id! listen to future events
         logic.onConnection(id, ctx.websocket);
