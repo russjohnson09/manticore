@@ -52,11 +52,74 @@ module.exports = {
         next();
     },
     "ws-connect": async (ctx, next) => {
-        process.exit(1);
-        console.log(`ws-connect`,ctx);
+        // process.exit(1);
+        console.log(`ws-connect`,ctx.id,ctx);
         //if instance information already exists for this user, then send it
         const positionInfo = getInfo(ctx.id, "position");
         const serviceInfo = getInfo(ctx.id, "services");
+        console.log(`ws-connect positionInfo serviceInfo`,ctx.id, positionInfo, serviceInfo);
+
+        if (true)
+        {
+            let data = {type: "position", data: {position: 0, wait: true}};
+            console.log(`ws-connect send`,data);
+            // websocket.send(ctx.id,JSON.stringify(data));
+            ctx.websocket.send(JSON.stringify(data));
+            // # Expose the following ports
+            // #   3001: Expose SDL Core's file system
+            // #   12345: Expose SDL Core's primary port. Used to communicate with the SDL Core instance over TCP
+            // #   5050: Expose video streaming port
+            // #   5080: Expose audio streaming port
+            // #   8090: Expose time testing port
+            // #   8888: Expose websocket port for core log streaming
+            // #   9000: Websocket connection to the broker
+            // #   9898: Expose miniature policy server port
+            // #EXPOSE 3001 12345 5050 5080 8090 8888 9000 9898
+            setTimeout(() => {
+                let data = {type: "position", data: {position: 0, wait: false}};
+
+
+                console.log(`ws-connect send`,data);
+                ctx.websocket.send(JSON.stringify(data));
+
+                // # Expose the following ports
+                // #   3001: Expose SDL Core's file system
+                // #   12345: Expose SDL Core's primary port. Used to communicate with the SDL Core instance over TCP
+                // #   5050: Expose video streaming port
+                // #   5080: Expose audio streaming port
+                // #   8090: Expose time testing port
+                // #   8888: Expose websocket port for core log streaming
+                // #   9000: Websocket connection to the broker
+                // #   9898: Expose miniature policy server port
+                // #EXPOSE 3001 12345 5050 5080 8090 8888 9000 9898
+                setTimeout(() => {
+                    let data =
+                      {"type":"services","data":
+                            {
+                                "core-broker":"wss://ncjgvmpiaoyy1sj2.mstaging.sdl.tools:444",
+                                "core-tcp":"197.168.1.57:12345",
+                                "core-file":"197.168.1.57:3001",
+                                "core-log":"ws://197.168.1.57:8888",
+                                "core-policy":"https://udahoewemfgfmzsf.mstaging.sdl.tools",
+                                // "hmi-user":"https://0iutt3k15ttntisp.mstaging.sdl.tools"
+
+                                "hmi-user":"hmi2.localhost"
+                            }};
+
+                    console.log(`ws-connect send`,data);
+                    ctx.websocket.send(JSON.stringify(data));
+
+                    next();
+                },1000);
+            },1000);
+
+
+
+
+
+            return;
+        }
+
         if (positionInfo) {
             await websocket.send(ctx.id, JSON.stringify(positionInfo));
         }

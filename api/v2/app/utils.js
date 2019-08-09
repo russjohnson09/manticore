@@ -10,16 +10,16 @@ const FAILURE_TYPE_PENDING = "PENDING";
 const FAILURE_TYPE_RESTART = "RESTART";
 
 /*
-    watchAllocationsToResolution and watchServicesToResolution only check until the job and services are healthy. 
+    watchAllocationsToResolution and watchServicesToResolution only check until the job and services are healthy.
     This means that they don't check for the case where an already healthy job/service becomes unhealthy.
-    
+
     watchAllocationsToResolution and watchServicesToResolution both use a forced end date and will not stop early
     unless a successful result is returned. watchAllocationsToResolution could stop early when a dead/failed state
-    is found since its starting state is pending, unlike with watching a service where it starts in a failed state. 
+    is found since its starting state is pending, unlike with watching a service where it starts in a failed state.
     However, there could be a case where an allocation is in a non-pending, non-running state when read and it is simply
     in transition to a pending or running state. Waiting for a running state seems like the better option of the two.
     The intent is to have a job in the running state so Manticore should be biased towards waiting for a running state
-    and face the possibility of the running state being an outdated value on read. The services check can confirm 
+    and face the possibility of the running state being an outdated value on read. The services check can confirm
     or deny whether the allocation is indeed healthy later
 */
 
@@ -122,7 +122,7 @@ async function autoHandleJob (ctx, jobName, jobFile, taskChecks, taskGroupNames,
     }
 
     //the job has to be running at this point, or else this should be considered a failure
-    if (!await allocationsHealthCheck(allocs, taskChecks)) { 
+    if (!await allocationsHealthCheck(allocs, taskChecks)) {
         logger.error(`Allocation failed for user ${ctx.currentRequest.id}!`);
         await logAllocationsError(allocs, recentEvals); //log the error information
 
@@ -143,11 +143,11 @@ async function watchAllocationsToResolution (jobName, taskChecks, endDate, index
     let waitTimeLeft = endDate - Date.now();
     waitTimeLeft = Math.max(0, waitTimeLeft); //cap the minimum time to zero
     waitTimeLeft = Math.ceil(waitTimeLeft / 1000); //the time left between now and endDate into seconds, rounded up
-    
+
     baseUrl = `${baseUrl}wait=${waitTimeLeft}s`;
 
     const response = await http(baseUrl); //get allocation info about the job
-    const newIndex = response.headers["x-nomad-index"]; 
+    const newIndex = response.headers["x-nomad-index"];
     const allocs = await parseJson(response.body);
 
     const filteredAllocs = await getLatestAllocations(allocs);
@@ -250,7 +250,7 @@ async function logAllocationsError (allocations, evals) {
             if (allocation.TaskStates[taskName].Events) {
                 allocation.TaskStates[taskName].Events.forEach(event => {
                     logger.error(event.DisplayMessage);
-                });                
+                });
             }
         }
     }
@@ -267,12 +267,12 @@ async function logAllocationsError (allocations, evals) {
                     logger.error(`${dimension} has been exhausted!`);
                 }
             }
-        }        
+        }
     });
 }
 
 /*
-    given an erroneous allocation, figure out what type of error it is and return a suggested action 
+    given an erroneous allocation, figure out what type of error it is and return a suggested action
     different errors necessitate different actions
     Errors like driver errors are not recoverable, so boot the user off the waiting list. (Permanent Failure)
     Errors like lack of resources on the machines just need time, so don't update the user's state. (Pending Failure)
@@ -282,13 +282,13 @@ async function logAllocationsError (allocations, evals) {
     returns one of the following strings: "PERMANENT", "PENDING", "RESTART"
 */
 async function determineAllocationsFailureType (allocations, evals) {
-    if (allocations.length === 0) { 
+    if (allocations.length === 0) {
         //no allocations were placed. check the evaluation details instead for information
         for (let i = 0; i < evals.length; i++) {
             const eval = evals[i];
-            if (eval.FailedTGAllocs !== null && eval.FailedTGAllocs !== undefined ) { 
+            if (eval.FailedTGAllocs !== null && eval.FailedTGAllocs !== undefined ) {
                 return FAILURE_TYPE_PENDING; //some lack of resource has caused the allocation to be unplacable
-            }    
+            }
         }
     }
     return FAILURE_TYPE_PERMANENT;
@@ -359,7 +359,7 @@ async function casJob (key) {
 async function autoHandleServices (ctx, serviceChecks, healthTime = 10000) {
     const serviceWatches = serviceChecks.map(serviceCheck => {
         //run synchronously to prevent blocking. force a result by healthTime milliseconds
-        return watchServicesToResolution(serviceCheck, Date.now() + healthTime); 
+        return watchServicesToResolution(serviceCheck, Date.now() + healthTime);
     });
     const services = await Promise.all(serviceWatches); //wait for resolution on all watches
 
@@ -370,7 +370,7 @@ async function autoHandleServices (ctx, serviceChecks, healthTime = 10000) {
     }, []);
 
     const servicesPassing = await servicesHealthCheck(flattenedServices, serviceChecks);
-    if (!servicesPassing) { 
+    if (!servicesPassing) {
         logger.error(`Health checks failed for user ${ctx.currentRequest.id}!`);
         await logServicesError(serviceChecks, flattenedServices); //log the error information
 
@@ -386,7 +386,7 @@ async function servicesHealthCheck (services, serviceChecks) {
     let requiredServicesMap = {};
     //populate the services map
     serviceChecks.forEach(serviceCheck => {
-        if (serviceCheck.check) { 
+        if (serviceCheck.check) {
             requiredServicesMap[serviceCheck.name] = serviceCheck.count;
         }
     });
@@ -409,6 +409,7 @@ async function servicesHealthCheck (services, serviceChecks) {
 
 //continuously hit the health checks endpoint until either the end date is passed or until the status is passing
 async function watchServicesToResolution (serviceCheck, endDate = 0, index) {
+    console.log(`watchServicesToResolution`);
     const serviceName = serviceCheck.name;
     let baseUrl = `http://${config.clientAgentIp}:${config.consulAgentPort}/v1/health/checks/${serviceName}?`;
     if (index !== undefined) {
@@ -424,7 +425,7 @@ async function watchServicesToResolution (serviceCheck, endDate = 0, index) {
     const response = await http(baseUrl); //get info about all the health checks from this service
     const newIndex = response.headers["x-consul-index"];
     const services = await parseJson(response.body);
-    
+
     //check if the current date is larger than the specified end date
     if (Date.now() > endDate) { //out of time. do not continue watching
         return services;
@@ -514,7 +515,7 @@ async function findServiceAddresses (serviceNames) {
 //queries consul for all nodes that house the running service
 async function getService (name) {
     const baseUrl = `http://${config.clientAgentIp}:${config.consulAgentPort}/v1/catalog/service/${name}`;
-    return http(baseUrl); 
+    return http(baseUrl);
 }
 
 //modifies ctx depending on what error string gets passed in

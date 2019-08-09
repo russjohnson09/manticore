@@ -4,6 +4,7 @@ const compose = require("koa-compose");
 const logger = require('./config.js').logger;
 const promisify = require('util').promisify;
 
+console.log(`loader`);
 //all the types of hooks that modules under the listeners folder can subscribe to
 const listenerOptions = [
     { name: "ws-connect", isMainHook: false},
@@ -30,6 +31,8 @@ module.exports = {
         const folders = await promisify(fs.readdir)(`${__dirname}/listeners`);
 
         let listenerHash = {}; // a map of arrays of function hooks
+
+        console.log(`loader`,`folders`,folders);
 
         folders.forEach(folder => {
             const listeners = require(`./listeners/${folder}`);
@@ -71,5 +74,5 @@ function executionTime (moduleName, eventName, f) {
             logger.debug(`Time -> ${moduleName}:${eventName}: ${timeMs} ms`);
             next();
         });
-    }    
+    }
 }

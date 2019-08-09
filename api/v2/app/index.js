@@ -33,6 +33,7 @@
 const config = require('./config.js');
 const {store, job, logger, websocket} = config;
 const check = require('check-types');
+console.log(`loader`,`app/index.js`)
 const loader = require('./loader.js');
 const BatchTimer = require('./BatchTimer.js');
 
@@ -76,6 +77,7 @@ module.exports = {
         }, Date.now() + config.maxDelayBuffer); //force an action to happen after this time if there are no other active dates
     },
     onConnection: async (id, websocket) => { //client connected over websockets
+        console.log(`onConnection`,id,listeners);
         const ctx = {
             id: id,
             websocket: websocket
@@ -112,7 +114,7 @@ for (let name in config.modes) {
 
 //TODO config for stub.
 //initialize watches to the KV store
-// startWatches().catch(err => logger.error(new Error(err).stack));
+startWatches().catch(err => logger.error(new Error(err).stack));
 
 async function startWatches () {
     //load up the listeners to the listener store
@@ -121,9 +123,16 @@ async function startWatches () {
     //invoke startup listeners. watches to the store will not happen until this phase completes
     await listeners['startup']({});
     //watch for KV store changes
+    console.log(`startup complete`);
     const w1 = await store.watch(REQUESTS_KEY, requestTrigger);
+    console.log(`w1`);
+
     const w2 = await store.watch(WAITING_KEY, waitingTrigger);
+    console.log(`w2`);
+
     await listeners['post-startup']({});
+    console.log(`post-startup`);
+
 }
 
 let previousRequestState = {}; //remembers only the users registered

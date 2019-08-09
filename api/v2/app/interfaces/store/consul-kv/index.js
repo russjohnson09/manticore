@@ -17,8 +17,9 @@ async function watch (key, cb) {
     });
     watch.on('error', function (err) { //couldn't connect to the agent
         if (err.code === "ECONNREFUSED") {
+            //TODO consul on mac
             // throw Error("Could not connect to Consul agent at IP " + config.clientAgentIp);
-            console.error("Could not connect to Consul agent at IP " + config.clientAgentIp);
+            // console.error("Could not connect to Consul agent at IP " + config.clientAgentIp);
         }
         else {
             throw Error(err);
