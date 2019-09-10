@@ -92,18 +92,39 @@ module.exports = {
                 // #   9000: Websocket connection to the broker
                 // #   9898: Expose miniature policy server port
                 // #EXPOSE 3001 12345 5050 5080 8090 8888 9000 9898
+
+                //{brokerAddress: "wss://ncjgvmpiaoyy1sj2.mstaging.sdl.tools:444", tcpAddress: "197.168.1.57:12345", userAddress: "hmi2.localhost", logAddress: "ws://197.168.1.57:8888", policyAddress: "https://udahoewemfgfmzsf.mstaging.sdl.tools"}
+                // brokerAddress: "wss://ncjgvmpiaoyy1sj2.mstaging.sdl.tools:444"
+                // logAddress: "ws://197.168.1.57:8888"
+                // policyAddress: "https://udahoewemfgfmzsf.mstaging.sdl.tools"
+                // tcpAddress: "197.168.1.57:12345"
+                // userAddress: "hmi2.localhost"
+
+                // brokerAddress: "wss://suu3xmm3l0xutksk.mstaging.sdl.tools:444"
+                // logAddress: "wss://xhab3cu493shyjmd.mstaging.sdl.tools:444"
+                // policyAddress: "https://537834fyag6hllg7.mstaging.sdl.tools"
+                // tcpAddress: "mstaging.sdl.tools:15294"
+                // userAddress: "https://pbmivi3fna2ro976.mstaging.sdl.tools" //hmi-user
+
+                //https://stackoverflow.com/questions/21410435/connect-websocket-server-by-lan-ip-address
                 setTimeout(() => {
                     let data =
                       {"type":"services","data":
                             {
-                                "core-broker":"wss://ncjgvmpiaoyy1sj2.mstaging.sdl.tools:444",
-                                "core-tcp":"197.168.1.57:12345",
-                                "core-file":"197.168.1.57:3001",
-                                "core-log":"ws://197.168.1.57:8888",
-                                "core-policy":"https://udahoewemfgfmzsf.mstaging.sdl.tools",
+                                // "core-tcp":"197.168.1.57:9010",
+                                // "core-broker":"ws://197.168.1.57:9011",
+                                // "core-file":"197.168.1.57:9012",
+                                // "core-log":"ws://197.168.1.57:9013",
+                                "core-log":"ws://localhost:9013",
+                                "core-tcp":"localhost:9010",
+                                "core-broker":"ws://localhost:9011",
+                                "core-file":"localhost:9012",
+
+                                "core-policy":"https://udahoewemfgfmzsf.mstaging.sdl.tools", //TODO don't really need to worry about this?
                                 // "hmi-user":"https://0iutt3k15ttntisp.mstaging.sdl.tools"
 
-                                "hmi-user":"hmi2.localhost"
+                                // "hmi-user":"hmi2.localhost", //generic_hmi host location //userAddress
+                                "hmi-user": "http://localhost:8081" //generic_hmi host location
                             }};
 
                     console.log(`ws-connect send`,data);
