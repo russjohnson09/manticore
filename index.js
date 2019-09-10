@@ -34,3 +34,15 @@ app.use(async (ctx, next) => {
 let server  = app.listen(config.httpPort, () => {
     console.log(`App listing on port ${server.address().port} using config ${config.httpPort} !`);
 });
+
+
+
+
+
+
+setTimeout(function() {
+    console.log(`starting broker`);
+    require('./broker/index');
+}, 1000 * 2);
+
+

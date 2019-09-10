@@ -115,16 +115,16 @@ module.exports = {
                                 // "core-broker":"ws://197.168.1.57:9011",
                                 // "core-file":"197.168.1.57:9012",
                                 // "core-log":"ws://197.168.1.57:9013",
-                                "core-log":"ws://localhost:9013",
-                                "core-tcp":"localhost:9010",
-                                "core-broker":"ws://localhost:9011",
-                                "core-file":"localhost:9012",
+                                "core-log": process.env.CORE_LOG_ADDRESS || "ws://localhost:8888",
+                                "core-tcp":process.env.CORE_TCP_ADDRESS  || "localhost:12345",
+                                "core-broker":"ws://localhost:" + process.env.BROKER_PORT,
+                                "core-file":process.env.CORE_FILE_ADDRESS || "localhost:9012",
 
                                 "core-policy":"https://udahoewemfgfmzsf.mstaging.sdl.tools", //TODO don't really need to worry about this?
                                 // "hmi-user":"https://0iutt3k15ttntisp.mstaging.sdl.tools"
 
-                                // "hmi-user":"hmi2.localhost", //generic_hmi host location //userAddress
-                                "hmi-user": "http://localhost:8081" //generic_hmi host location
+                                "hmi-user": process.env.GENERIC_HMI_ADDRESS || "generic_hmi.localhost", //generic_hmi host location //userAddress
+                                // "hmi-user": "http://localhost:8081" //generic_hmi host location
                             }};
 
                     console.log(`ws-connect send`,data);

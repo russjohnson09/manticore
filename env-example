@@ -1,0 +1,49 @@
+#JWT_SECRET=ri@)$oxi8=+cs4x97^2=*lydd#3b*+9xtkfp86l00l4!3up1ps
+
+
+JWT_SECRET=ri@)$oxi8=+cs4x97^2=*lydd#3b*+9xtkfp86l00l4!3up1ps
+
+CORS=true
+
+HTTP_PORT=4100
+
+
+
+
+#HAPROXY_HTTP_PORT
+
+
+# The name of your domain that you use to direct users to
+# local ip addresses of resources
+# The lowest port and highest number that HAProxy can open ports on for
+# TCP connections. Make sure your security groups are configured so that
+# these ports can be accessed from anywhere and that there are no other
+# programs on your OS that are currently using these ports.
+
+
+# The port HAProxy opens for web traffic, including to Manticore
+
+
+#10.0.2.15
+#27796
+TCP_PORT_RANGE_START=6661
+TCP_PORT_RANGE_END=7770
+DOMAIN_NAME=manticore.localhost
+#DOMAIN_NAME=haproxy.manticore
+
+HAPROXY_HTTP_PORT=80
+
+#PORT FOR the web socket communicating between manticore ui, the generic hmi, and core.
+#combines the
+BROKER_PORT=9001
+
+
+
+#ws://localhost:6660/api/v2/job/TeDv2Yg05iTK1ID0
+
+
+#b06094f96e44        871540e03435        "/bin/bash setup.sh"   4 minutes ago       Up 4 minutes
+#5050/tcp, 5080/tcp, 8090/tcp, 10.0.2.15:20409->3001/tcp, 10.0.2.15:20409->3001/udp,
+#10.0.2.15:26301->8888/tcp, 10.0.2.15:26301->8888/udp, 10.0.2.15:27796->9000/tcp, 10.0.2.15:27796->9000/udp, 10.0.2.15:27567->12345/tcp, 10.0.2.15:27567->12345/udp   core-task-1-1759fb52-89ed-37cd-de7b-2af0690797e2
+
+#http://consul.localhost/ui/dc1/kv/templateData/edit
