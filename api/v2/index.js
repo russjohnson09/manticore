@@ -47,6 +47,7 @@ module.exports = app => {
 
     //https://stackoverflow.com/questions/49633157/how-do-i-set-headers-to-all-responses-in-koa-js
     app.use(function(ctx, next) {
+        console.log(`got request ${new Date()}`);
         ctx.set("Access-Control-Allow-Origin", "*");
         // res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         ctx.set("Access-Control-Allow-Headers", "*");

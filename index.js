@@ -32,5 +32,5 @@ app.use(async (ctx, next) => {
 
 
 let server  = app.listen(config.httpPort, () => {
-    console.log(`Example app listening on port ${server.address().port} using config ${config.httpPort} !`);
+    console.log(`App listing on port ${server.address().port} using config ${config.httpPort} !`);
 });

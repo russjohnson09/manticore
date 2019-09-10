@@ -114,8 +114,8 @@ for (let name in config.modes) {
 
 //TODO config for stub.
 //initialize watches to the KV store
+//(node:65447) UnhandledPromiseRejectionWarning: TypeError: listeners.ws-connect is not a function
 startWatches().catch(err => logger.error(new Error(err).stack));
-
 async function startWatches () {
     //load up the listeners to the listener store
     listeners = await loader.init();
