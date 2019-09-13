@@ -43,6 +43,12 @@ let server  = app.listen(config.httpPort, () => {
 setTimeout(function() {
     console.log(`starting broker`);
     require('./broker/index');
+
+    setTimeout(function() {
+        console.log(`starting logger`);
+        require('./logstream/server');
+
+    }, 1000 * 1)
 }, 1000 * 2);
 
 

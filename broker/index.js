@@ -55,10 +55,26 @@ sdlWebsocket.on('connect', function(connection) {
     });
 
 
-// server.listen(8086);
+
+    try {
+
+        server.on('error', function(err) {
+            console.log(`in use?`,err);
+
+        })
+        // server.listen(8086);
 
 //only start listening once a connection is established.
-    server.listen(process.env.BROKER_PORT || 9001);
+        server.listen(process.env.BROKER_PORT || 9001, function(err) {
+            console.log(`in use?`,err);
+        });
+
+    }
+    catch(e)
+    {
+        console.log(`failed to start broker`);
+    }
+
 
 
 
@@ -77,8 +93,8 @@ sdlWebsocket.on('close', function(err) {
 sdlWebsocket.on('connectFailed', function(error) {
     console.log('Connect Error: ' + error.toString());
 
-    console.log(`attempting to connection to core retry`,{wsUrlCore});
-    sdlWebsocket.connect(wsUrlCore);
+    // console.log(`attempting to connection to core retry`,{wsUrlCore});
+    // sdlWebsocket.connect(wsUrlCore);
 });
 
 
@@ -176,20 +192,27 @@ function forwardToSDL(msg) {
 */
 
 function forwardToClients(msg) {
-    var componentName = undefined;
-    for(var i in conClients) {
-        var rpc = JSON.parse(msg);
-        if(rpc.method) {
-            componentName = rpc.method.split(".")[0];
-            console.log("Extracted Component Name: " + componentName);
-            if(conClients[i].registeredComponents[componentName] == true) {
+    try {
+        var componentName = undefined;
+        for(var i in conClients) {
+            var rpc = JSON.parse(msg);
+            if(rpc.method) {
+                componentName = rpc.method.split(".")[0];
+                console.log("Extracted Component Name: " + componentName);
+                if(conClients[i].registeredComponents[componentName] == true) {
+                    conClients[i].send(msg);
+                }
+            } else {
+                componentName = undefined;
                 conClients[i].send(msg);
             }
-        } else {
-            componentName = undefined;
-            conClients[i].send(msg);
         }
     }
+    catch (e)
+    {
+        console.error(`failed to forwardToClients`,e);
+    }
+
 }
 
 function addObserver(id, component) {

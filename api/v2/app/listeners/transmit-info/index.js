@@ -123,7 +123,7 @@ module.exports = {
                                 "core-policy":"https://udahoewemfgfmzsf.mstaging.sdl.tools", //TODO don't really need to worry about this?
                                 // "hmi-user":"https://0iutt3k15ttntisp.mstaging.sdl.tools"
 
-                                "hmi-user": process.env.GENERIC_HMI_ADDRESS || "generic_hmi.localhost", //generic_hmi host location //userAddress
+                                "hmi-user": process.env.GENERIC_HMI_ADDRESS || "http://generic_hmi.localhost", //generic_hmi host location //userAddress
                                 // "hmi-user": "http://localhost:8081" //generic_hmi host location
                             }};
 
