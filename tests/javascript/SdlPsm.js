@@ -3,89 +3,68 @@ const SdlPacket = require('./SdlPacket');
 
 const SdlPsm = class SdlPsm {
 
-
-    constructor()
-    {
+    constructor() {
         this.state = 0;
 
         this.state = SdlPsm.START_STATE;
-
 
         this.version = 0;
 
     }
 
-
-    readByte(byte)
-    {
+    readByte(byte) {
         let self = this;
         // print("Current state: ", self.state)
         self.state = self.transitionOnInput(byte, self.state);
-        console.log(`readByte`,byte,self.state);
+        console.log(`readByte`, byte, self.state);
 
-        if (self.state === SdlPsm.ERROR_STATE)
-        {
-            return false
-        }
-        else {
+        if (self.state === SdlPsm.ERROR_STATE) {
+            return false;
+        } else {
             return true;
         }
     }
 
-    getVersionFromByte(byte)
-    {
+    getVersionFromByte(byte) {
         let version = (byte & SdlPsm.VERSION_MASK) >> 4;
-        console.log(`getVersionFromByte`,byte, SdlPsm.VERSION_MASK,version);
+        console.log(`getVersionFromByte`, byte, SdlPsm.VERSION_MASK, version);
 
         return version;
     }
 
-    handleControlFrameInfoState(raw_byte)
-    {
+    handleControlFrameInfoState(raw_byte) {
         let self = this;
         self.controlFrameInfo = raw_byte & 0xFF;
 
         if (
             self.frameType === SdlPacket.FRAME_TYPE_CONTROL ||
             self.frameType === SdlPacket.FRAME_TYPE_CONSECUTIVE
-        )
-        {
+        ) {
             return; //pseudo break;
-        }
-        else if (self.frameType === SdlPacket.FRAME_TYPE_SINGLE
-        || self.frameType === SdlPacket.FRAME_TYPE_SINGLE
-        )
-        {
+        } else if (self.frameType === SdlPacket.FRAME_TYPE_SINGLE
+            || self.frameType === SdlPacket.FRAME_TYPE_SINGLE
+        ) {
 
         }
-
-
-
-
-
 
         //     self.controlFrameInfo = raw_byte & 0xFF
-    //     if self.frameType == SdlPacket.SdlPacket.FRAME_TYPE_CONTROL or self.frameType == SdlPacket.SdlPacket.FRAME_TYPE_CONSECUTIVE:
-    //     self.pseudo_break()
-    //     elif self.frameType == SdlPacket.SdlPacket.FRAME_TYPE_SINGLE \
-    //                 or self.frameType == SdlPacket.SdlPacket.FRAME_TYPE_FIRST:
-    //     # Fall through since they are both the same
-    //     if self.controlFrameInfo != 0x00:
-    //     return self.ERROR_STATE
-    // else:
-    //     return self.ERROR_STATE
+        //     if self.frameType == SdlPacket.SdlPacket.FRAME_TYPE_CONTROL or self.frameType == SdlPacket.SdlPacket.FRAME_TYPE_CONSECUTIVE:
+        //     self.pseudo_break()
+        //     elif self.frameType == SdlPacket.SdlPacket.FRAME_TYPE_SINGLE \
+        //                 or self.frameType == SdlPacket.SdlPacket.FRAME_TYPE_FIRST:
+        //     # Fall through since they are both the same
+        //     if self.controlFrameInfo != 0x00:
+        //     return self.ERROR_STATE
+        // else:
+        //     return self.ERROR_STATE
     }
 
-
-    transitionOnInput(raw_byte,state)
-    {
+    transitionOnInput(raw_byte, state) {
         let self = this;
 
-        if (state === SdlPsm.START_STATE)
-        {
+        if (state === SdlPsm.START_STATE) {
             this.version = this.getVersionFromByte(raw_byte);
-            if (self.version === 0)
-            {
+            if (self.version === 0) {
                 return SdlPsm.ERROR_STATE;
             }
 
@@ -93,12 +72,11 @@ const SdlPsm = class SdlPsm {
 
             self.frameType = raw_byte & SdlPsm.FRAME_TYPE_MASK;
 
-
             // # Log.trace(TAG, raw_byte + " = Frame Type: " + frameType);
 
             // # These are known versions supported by this library.
-        // if (self.version < 1 or self.version > 5) and self.frameType != SdlPacket.SdlPacket.FRAME_TYPE_CONTROL:
-        //     return self.ERROR_STATE
+            // if (self.version < 1 or self.version > 5) and self.frameType != SdlPacket.SdlPacket.FRAME_TYPE_CONTROL:
+            //     return self.ERROR_STATE
 
             // if self.frameType < SdlPacket.SdlPacket.FRAME_TYPE_CONTROL \
             // or self.frameType > SdlPacket.SdlPacket.FRAME_TYPE_CONSECUTIVE:
@@ -107,18 +85,13 @@ const SdlPsm = class SdlPsm {
             // # We made it through.
             return SdlPsm.SERVICE_TYPE_STATE;
 
-        }
-        else if (state === SdlPsm.SERVICE_TYPE_STATE)
-        {
+        } else if (state === SdlPsm.SERVICE_TYPE_STATE) {
             self.serviceType = (raw_byte & 0xFF);
 
-            return SdlPsm.CONTROL_FRAME_INFO_STATE
-        }
-        else if (state === SdlPsm.CONTROL_FRAME_INFO_STATE)
-        {
+            return SdlPsm.CONTROL_FRAME_INFO_STATE;
+        } else if (state === SdlPsm.CONTROL_FRAME_INFO_STATE) {
             return self.handleControlFrameInfoState(raw_byte);
-        }
-        else {
+        } else {
 
         }
         //
@@ -219,8 +192,6 @@ const SdlPsm = class SdlPsm {
     }
 
 };
-
-
 
 SdlPsm.START_STATE = 0x0;
 SdlPsm.SERVICE_TYPE_STATE = 0x02;

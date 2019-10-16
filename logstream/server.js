@@ -36,7 +36,7 @@ const ts = require('tail-stream');
 const FILE_PATH = __dirname + '/fake.log';
 
 const wss = new WebSocket.Server({
-    port: process.env.CORE_LOG_PORT
+    port: process.env.CORE_LOG_PORT || 8888
 });
 
 wss.on('error', function(err) {

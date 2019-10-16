@@ -61,10 +61,17 @@ module.exports = {
 
         if (true)
         {
+            let ws = ctx.websocket;
+
             let data = {type: "position", data: {position: 0, wait: true}};
             console.log(`ws-connect send`,data);
             // websocket.send(ctx.id,JSON.stringify(data));
-            ctx.websocket.send(JSON.stringify(data));
+            if (ws.readyState === ws.OPEN) {
+                ctx.websocket.send(JSON.stringify(data));
+            }
+            else {
+                console.log(`cannot send message client is `,ws.readyState)
+            }
             // # Expose the following ports
             // #   3001: Expose SDL Core's file system
             // #   12345: Expose SDL Core's primary port. Used to communicate with the SDL Core instance over TCP
@@ -80,33 +87,14 @@ module.exports = {
 
 
                 console.log(`ws-connect send`,data);
-                ctx.websocket.send(JSON.stringify(data));
 
-                // # Expose the following ports
-                // #   3001: Expose SDL Core's file system
-                // #   12345: Expose SDL Core's primary port. Used to communicate with the SDL Core instance over TCP
-                // #   5050: Expose video streaming port
-                // #   5080: Expose audio streaming port
-                // #   8090: Expose time testing port
-                // #   8888: Expose websocket port for core log streaming
-                // #   9000: Websocket connection to the broker
-                // #   9898: Expose miniature policy server port
-                // #EXPOSE 3001 12345 5050 5080 8090 8888 9000 9898
+                if (ws.readyState === ws.OPEN) {
+                    ws.send(JSON.stringify(data));
+                }
+                else {
+                    console.log(`cannot send message client is `,ws.readyState)
+                }
 
-                //{brokerAddress: "wss://ncjgvmpiaoyy1sj2.mstaging.sdl.tools:444", tcpAddress: "197.168.1.57:12345", userAddress: "hmi2.localhost", logAddress: "ws://197.168.1.57:8888", policyAddress: "https://udahoewemfgfmzsf.mstaging.sdl.tools"}
-                // brokerAddress: "wss://ncjgvmpiaoyy1sj2.mstaging.sdl.tools:444"
-                // logAddress: "ws://197.168.1.57:8888"
-                // policyAddress: "https://udahoewemfgfmzsf.mstaging.sdl.tools"
-                // tcpAddress: "197.168.1.57:12345"
-                // userAddress: "hmi2.localhost"
-
-                // brokerAddress: "wss://suu3xmm3l0xutksk.mstaging.sdl.tools:444"
-                // logAddress: "wss://xhab3cu493shyjmd.mstaging.sdl.tools:444"
-                // policyAddress: "https://537834fyag6hllg7.mstaging.sdl.tools"
-                // tcpAddress: "mstaging.sdl.tools:15294"
-                // userAddress: "https://pbmivi3fna2ro976.mstaging.sdl.tools" //hmi-user
-
-                //https://stackoverflow.com/questions/21410435/connect-websocket-server-by-lan-ip-address
                 setTimeout(() => {
                     let data =
                       {"type":"services","data":
@@ -128,7 +116,12 @@ module.exports = {
                             }};
 
                     console.log(`ws-connect send`,data);
-                    ctx.websocket.send(JSON.stringify(data));
+                    if (ws.readyState === ws.OPEN) {
+                        ctx.websocket.send(JSON.stringify(data));
+                    }
+                    else {
+                        console.log(`cannot send message client is `,ws.readyState)
+                    }
 
                     next();
                 },1000);

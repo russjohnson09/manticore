@@ -31,7 +31,8 @@
  */
 
 var http = require('http');
-var server = http.createServer(function(request, response) {});
+var server = http.createServer(function(request, response) {
+});
 var WebSocketServer = require('websocket').server;
 var WebSocketClient = require('websocket').client;
 
@@ -41,132 +42,109 @@ var sdlConnection = {};
 var registeredComponents = {};
 var sdlWebsocket = new WebSocketClient();
 
+//connect to core.
+let wsUrlCore = process.env.CORE_WS_CONNECTION || 'ws://localhost:8087';
+
+// sdlWebsocket.connect('ws://localhost:8087');
+
+// sdlWebsocket.connect(wsUrlCore,'echo-protocol');
+
 /*
 // Connection to Core. This application is treated
 // as the client in the implementation.
 */
-sdlWebsocket.on('connect', function(connection) {
-    console.log('Connected to SDL');
-    sdlConnection = connection;
-    sdlConnection.on('message', function(message) {
-        var msg = message.utf8Data;
-        //console.log(msg);
-        forwardToClients(msg);
-    });
 
+async function sleep(time)
+{
+    return new Promise((resolve) => {
+        setTimeout(resolve,time);
+    })
+}
 
+async function reConnectToCore() {
+    console.log(`attempting to reconnect to core`, { wsUrlCore });
+    console.log(`wait for core to restart`);
 
-    try {
+    for (let i = 0; i < 1; i++)
+    {
+        console.log(`${i}`);
+        await sleep(1000);
 
-        server.on('error', function(err) {
-            console.log(`in use?`,err);
+    }
+    console.log(`try to connect`);
+    sdlWebsocket = new WebSocketClient();
+    sdlWebsocket.connect(wsUrlCore);
+    sdlWebsocket.on('connect', function(connection) {
+        console.log('Connected to SDL');
+        sdlConnection = connection;
 
-        })
-        // server.listen(8086);
-
-//only start listening once a connection is established.
-        server.listen(process.env.BROKER_PORT || 9001, function(err) {
-            console.log(`in use?`,err);
+        sdlConnection.on('message', function(message) {
+            var msg = message.utf8Data;
+            //console.log(msg);
+            forwardToClients(msg);
         });
 
-    }
-    catch(e)
-    {
-        console.log(`failed to start broker`);
-    }
+
+        sdlConnection.on('close', function() {
+            console.log(`connection closed`)
+            reConnectToCore();
+        });
+    });
+
+    sdlWebsocket.on('error', function(err) {
+        console.log('failed to connect to sdl', err);
+        reConnectToCore();
 
 
+    });
+
+    sdlWebsocket.on('close', function(err) {
+        console.log('failed to connect to sdl closed', err);
+        reConnectToCore();
 
 
-});
+    });
+
+    sdlWebsocket.on('connectFailed', function(error) {
+        console.log('Connect Error: ' + error.toString());
+        reConnectToCore();
+
+    });;
+}
+
+reConnectToCore();
+
+// console.log(`attempting to connection to core`, { wsUrlCore });
+// sdlWebsocket.connect(wsUrlCore);
+// sdlWebsocket.on('connect', function(connection) {
+//     console.log('Connected to SDL');
+//     sdlConnection = connection;
+//     sdlConnection.on('message', function(message) {
+//         var msg = message.utf8Data;
+//         //console.log(msg);
+//         forwardToClients(msg);
+//     });
+//
+//     sdlConnection.on('close', function()
+//     {
+//         console.log(`connection to sdl closed`);
+//         reConnectToCore();
+//     });
+//
+// });
 
 sdlWebsocket.on('error', function(err) {
-    console.log('failed to connect to sdl',err);
+    console.log('failed to connect to sdl', err);
 
 });
 
 sdlWebsocket.on('close', function(err) {
-    console.log('failed to connect to sdl closed',err);
+    console.log('failed to connect to sdl closed', err);
 
 });
 
 sdlWebsocket.on('connectFailed', function(error) {
     console.log('Connect Error: ' + error.toString());
-
-    // console.log(`attempting to connection to core retry`,{wsUrlCore});
-    // sdlWebsocket.connect(wsUrlCore);
-});
-
-
-//12345 is the tcp connection for apps.
-// let wsUrlCore = process.env.CORE_WS_CONNECTION || 'ws://localhost:12345';
-
-// LinkToWebHMI = HMI//index.html
-// ; WebSocket connection address and port
-// ServerAddress = 127.0.0.1
-// ServerPort = 8087
-let wsUrlCore = process.env.CORE_WS_CONNECTION || 'ws://localhost:8087';
-
-// sdlWebsocket.connect('ws://localhost:8087');
-console.log(`attempting to connection to core`,{wsUrlCore});
-sdlWebsocket.connect(wsUrlCore);
-// sdlWebsocket.connect(wsUrlCore,'echo-protocol');
-
-/*
-// Creating websocket server to allow connections
-// from different HMI Clients. This app will track
-// HMI component registration and will block clients
-// from sending duplicate component registerations
-// to SDL Core.
-*/
-
-var wsServer = new WebSocketServer({
-    httpServer: server
-});
-
-wsServer.on('request', function(hmi){
-
-    var connection = hmi.accept(null, hmi.origin);
-    console.log("Client Connected");
-    var id = numClients++;
-    conClients[id] = connection;
-    conClients[id].registeredComponents = {};
-
-    connection.on('message', function(message) {
-        var msg = message.utf8Data;
-        console.log(msg);
-
-        console.log(`received message`,message,`hmi`,hmi.origin);
-
-        var rpc = JSON.parse(msg);
-        if (rpc.notRpc) { //propagate the message to all HMIs instead of to core
-            return forwardToClients(msg);
-        }
-
-        switch(rpc.method)  {
-            case "MB.registerComponent":
-                if(!(rpc.params.componentName in registeredComponents)) {
-                    console.log("Registering Component: " + rpc.params.componentName);
-                    registeredComponents[rpc.params.componentName] = true;
-                    addObserver(id, rpc.params.componentName);
-                    forwardToSDL(msg);
-                } else {
-                    console.log("Component Already Registered");
-                    console.log("Adding Client As Observer For" + rpc.params.componentName);
-                    addObserver(id, rpc.params.componentName);
-                }
-                break;
-            default:
-                forwardToSDL(msg);
-                break;
-        }
-    });
-
-    connection.on('close', function(reasonCode, description) {
-        delete conClients[id];
-        console.log("Client Disconnected " + id);
-        console.log(conClients);
-    });
 });
 
 /*
@@ -175,13 +153,12 @@ wsServer.on('request', function(hmi){
 */
 
 function forwardToSDL(msg) {
+    console.log(`forwardToSDL`,msg)
     try {
         sdlConnection.send(msg);
 
-    }
-    catch(e)
-    {
-        console.log(`failed to forward message`,sdlConnection,e);
+    } catch (e) {
+        console.log(`failed to forward message`, sdlConnection, e);
     }
 }
 
@@ -192,14 +169,15 @@ function forwardToSDL(msg) {
 */
 
 function forwardToClients(msg) {
+    console.log(`forwardToClients`,msg)
     try {
         var componentName = undefined;
-        for(var i in conClients) {
+        for (var i in conClients) {
             var rpc = JSON.parse(msg);
-            if(rpc.method) {
-                componentName = rpc.method.split(".")[0];
-                console.log("Extracted Component Name: " + componentName);
-                if(conClients[i].registeredComponents[componentName] == true) {
+            if (rpc.method) {
+                componentName = rpc.method.split('.')[0];
+                console.log('Extracted Component Name: ' + componentName);
+                if (conClients[i].registeredComponents[componentName] == true) {
                     conClients[i].send(msg);
                 }
             } else {
@@ -207,19 +185,94 @@ function forwardToClients(msg) {
                 conClients[i].send(msg);
             }
         }
-    }
-    catch (e)
-    {
-        console.error(`failed to forwardToClients`,e);
+    } catch (e) {
+        console.error(`failed to forwardToClients`, e);
     }
 
 }
 
 function addObserver(id, component) {
-    if(!(component in conClients[id].registeredComponents)) {
+    if (!(component in conClients[id].registeredComponents)) {
         conClients[id].registeredComponents[component] = true;
-        console.log("Adding Client " + id + " as observer for component " + component);
+        console.log('Adding Client ' + id + ' as observer for component ' + component);
     }
 }
 
+
+
+
+server.on('error', function(err) {
+    console.log(`in use?`, err);
+
+});
+// server.listen(8086);
+
+let port = process.env.BROKER_PORT || 9001;
+//only start listening once a connection is established.
+server.listen(port, function(err) {
+    if (err) {
+        console.log(`in use?`, err);
+    } else {
+        console.log(`broker listening on port ${port}`);
+
+    }
+});
+
+/*
+// Creating websocket server to allow connections
+// from different HMI Clients. This app will track
+// HMI component registration and will block clients
+// from sending duplicate component registerations
+// to SDL Core.
+*/
+
+var wsServer = new WebSocketServer({
+                                       httpServer: server
+                                   });
+
+wsServer.on('request', function(hmi) {
+
+    var connection = hmi.accept(null, hmi.origin);
+    console.log('Client Connected');
+    var id = numClients++;
+    conClients[id] = connection;
+    conClients[id].registeredComponents = {};
+
+    connection.on('message', function(message) {
+        var msg = message.utf8Data;
+        console.log(msg);
+
+        console.log(`received message`, message, `hmi`, hmi.origin);
+
+        var rpc = JSON.parse(msg);
+        if (rpc.notRpc) { //propagate the message to all HMIs instead of to core
+            return forwardToClients(msg);
+        }
+
+        switch ( rpc.method ) {
+            case 'MB.registerComponent':
+                if (!(rpc.params.componentName in registeredComponents)) {
+                    console.log('Registering Component: ' + rpc.params.componentName);
+                    registeredComponents[rpc.params.componentName] = true;
+                    addObserver(id, rpc.params.componentName);
+                    forwardToSDL(msg);
+                } else {
+                    console.log('Component Already Registered');
+                    console.log('Adding Client As Observer For' + rpc.params.componentName);
+                    addObserver(id, rpc.params.componentName);
+                }
+                break;
+            default:
+                forwardToSDL(msg);
+                break;
+        }
+    });
+
+
+    connection.on('close', function(reasonCode, description) {
+        delete conClients[id];
+        console.log('Client Disconnected ' + id);
+        console.log(conClients);
+    })
+});
 

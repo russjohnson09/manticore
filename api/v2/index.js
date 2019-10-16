@@ -73,6 +73,7 @@ module.exports = app => {
     // }
 
     //all routes under /api/v2 are eligible for identification via JWT if enabled
+    config.modes.jwt = false;
     if (config.modes.jwt) {
         app.use(jwt({secret: config.jwtSecret}).unless({path: [/^(?!\/api\/v2).+/]}));
     }
@@ -81,6 +82,10 @@ module.exports = app => {
     app.use(async (ctx, next) => {
         if (config.modes.jwt && ctx.state.user) {
             ctx.request.body.id = '' + ctx.state.user.user_id;
+        }
+        else {
+            console.log(`set uer to 1`);
+            ctx.request.body.id = '1';
         }
         await next();
     });
